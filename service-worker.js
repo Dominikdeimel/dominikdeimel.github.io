@@ -5,6 +5,7 @@ const toCache = [
     '/css/styles.min.css',
     '/js/pwa.webmanifest',
     '/images/apple-touch.png',
+    '/images/offlineImage.png',
     '/images/splash-screen.png'
 ];
 
