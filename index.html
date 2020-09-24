@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deep Quote Image Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#764ABC"/>
+    <link rel="apple-touch-icon" href="/images/apple-touch.png">
+    <link rel="manifest" href="/js/pwa.webmanifest">
+    <link rel="stylesheet" href="/css/styles.min.css" />
+</head>
+<body>
+<script src="/js/main.min.js"></script>
+<div class="main" id="mainPage" style="font-family: Barlow">
+    <canvas id="myCanvas"></canvas>
+</div>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function (){
+            navigator.serviceWorker.register('/service-worker.js')
+                .then((reg) => {
+                    console.log('Service worker registered -->', reg);
+                }, (err) => {
+                    console.error('Service worker not registered -->', err);
+                });
+        });
+    }
+</script>
+</body>
+</html>
