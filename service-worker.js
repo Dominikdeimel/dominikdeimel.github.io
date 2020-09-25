@@ -5,14 +5,23 @@ const toCache = [
     '/css/styles.min.css',
     '/js/pwa.webmanifest',
     '/images/apple-touch.png',
-    '/images/offlineImage.png',
     '/images/splash-screen.png',
-    new Request('https://beibootapi.herokuapp.com/random/single?format=portrait'),
-    new Request('https://beibootapi.herokuapp.com/random/single?format=landscape'),
+    '/font/Barlow-Light.ttf',
+    '/font/Barlow-Regular.ttf',
+    new Request('https://beibootapi.herokuapp.com/random?format=portrait'),
+    new Request('https://beibootapi.herokuapp.com/random?format=landscape')
 ];
 
-fetch('https://beibootapi.herokuapp.com/random/single?format=portrait').then(response => response.json()).then(data => toCache.push(`https://beibootapi.herokuapp.com/image/${data.image}`));
-fetch('https://beibootapi.herokuapp.com/random/single?format=landscape').then(response => response.json()).then(data => toCache.push(`https://beibootapi.herokuapp.com/image/${data.image}`));
+fetch('https://beibootapi.herokuapp.com/random?format=portrait').then(response => response.json()).then(data => {
+    toCache.push(`https://beibootapi.herokuapp.com/image/${data.image}`);
+    console.log(data.image);
+});
+fetch('https://beibootapi.herokuapp.com/random?format=landscape').then(response => response.json()).then(data => {
+    toCache.push(`https://beibootapi.herokuapp.com/image/${data.image}`);
+    console.log(data.image);
+});
+
+
 self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -25,12 +34,12 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
     event.respondWith(
-        fetch(event.request)
-            .catch(() => {
-                return caches.open(CACHE_NAME)
-                    .then((cache) => {
-                        return cache.match(event.request);
-                    });
+        caches.match(event.request)
+            .then(request => {
+                if(request){
+                    return request;
+                }
+                return fetch(event.request);
             })
     );
 });

@@ -1,1 +1,1 @@
-@import"https://fonts.googleapis.com/css?family=Barlow";.main{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%)}/*# sourceMappingURL=styles.min.css.map */
+@font-face{font-family:"Barlow Light";src:url(/font/Barlow-Light.ttf) format("truetype")}@font-face{font-family:"Barlow Regular";src:url(/font/Barlow-Regular.ttf) format("truetype")}.main{font-family:"Barlow Regular";position:fixed;top:50%;left:50%;transform:translate(-50%, -50%)}/*# sourceMappingURL=styles.min.css.map */
