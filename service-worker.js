@@ -6,9 +6,13 @@ const toCache = [
     '/js/pwa.webmanifest',
     '/images/apple-touch.png',
     '/images/offlineImage.png',
-    '/images/splash-screen.png'
+    '/images/splash-screen.png',
+    new Request('https://beibootapi.herokuapp.com/random/single?format=portrait'),
+    new Request('https://beibootapi.herokuapp.com/random/single?format=landscape'),
 ];
 
+fetch('https://beibootapi.herokuapp.com/random/single?format=portrait').then(response => response.json()).then(data => toCache.push(`https://beibootapi.herokuapp.com/image/${data.image}`));
+fetch('https://beibootapi.herokuapp.com/random/single?format=landscape').then(response => response.json()).then(data => toCache.push(`https://beibootapi.herokuapp.com/image/${data.image}`));
 self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME)
