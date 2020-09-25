@@ -1,4 +1,6 @@
 const CACHE_NAME = 'DQIG_CACHE';
+const headers = new Headers();
+headers.set('Cache-Control','max-age=86400');
 const toCache = [
     '/',
     '/js/main.min.js',
@@ -8,19 +10,9 @@ const toCache = [
     '/images/splash-screen.png',
     '/font/Barlow-Light.ttf',
     '/font/Barlow-Regular.ttf',
-    new Request('https://beibootapi.herokuapp.com/random?format=portrait'),
-    new Request('https://beibootapi.herokuapp.com/random?format=landscape')
+    new Request('https://beibootapi.herokuapp.com/random?mode=portrait', {headers: headers}),
+    new Request('https://beibootapi.herokuapp.com/random?mode=landscape', {headers: headers})
 ];
-
-fetch('https://beibootapi.herokuapp.com/random?format=portrait').then(response => response.json()).then(data => {
-    toCache.push(`https://beibootapi.herokuapp.com/image/${data.image}`);
-    console.log(data.image);
-});
-fetch('https://beibootapi.herokuapp.com/random?format=landscape').then(response => response.json()).then(data => {
-    toCache.push(`https://beibootapi.herokuapp.com/image/${data.image}`);
-    console.log(data.image);
-});
-
 
 self.addEventListener('install', function(event) {
     event.waitUntil(
@@ -28,16 +20,15 @@ self.addEventListener('install', function(event) {
             .then(function(cache) {
                 return cache.addAll(toCache);
             })
-            .then(self.skipWaiting())
     );
 });
 
 self.addEventListener('fetch', function(event) {
     event.respondWith(
         caches.match(event.request)
-            .then(request => {
-                if(request){
-                    return request;
+            .then(cachedResponse => {
+                if(cachedResponse && !navigator.onLine){
+                    return cachedResponse;
                 }
                 return fetch(event.request);
             })
@@ -57,4 +48,17 @@ self.addEventListener('activate', function(event) {
             })
             .then(() => self.clients.claim())
     );
+});
+
+fetch('https://beibootapi.herokuapp.com/random?mode=portrait').then(response => response.json()).then(data => {
+    caches.open(CACHE_NAME)
+        .then(function(cache) {
+            return cache.add(`https://beibootapi.herokuapp.com/image/${data.image}`);
+        });
+});
+fetch('https://beibootapi.herokuapp.com/random?mode=landscape').then(response => response.json()).then(data => {
+    caches.open(CACHE_NAME)
+        .then(function(cache) {
+            return cache.add(`https://beibootapi.herokuapp.com/image/${data.image}`);
+        });
 });
