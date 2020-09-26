@@ -4,7 +4,6 @@ headers.set('Cache-Control', 'max-age=86400');
 
 const requestPortrait = new Request('https://beibootapi.herokuapp.com/random?mode=portrait', {headers: headers});
 const requestLandscape = new Request('https://beibootapi.herokuapp.com/random?mode=landscape', {headers: headers});
-const requestQuote = new Request('https://quotes.rest/qod');
 
 const toCache = [
     '/',
@@ -12,7 +11,11 @@ const toCache = [
     '/css/styles.min.css',
     '/js/pwa.webmanifest',
     '/images/apple-touch.png',
-    '/images/splash-screen.png',
+    '/images/android-chrome-192x192.png',
+    '/images/android-chrome-512x512.png',
+    '/images/favicon.ico',
+    '/images/favicon-16x16.png',
+    '/images/favicon-32x32.png',
     '/font/Barlow-Light.ttf',
     '/font/Barlow-Regular.ttf',
     requestPortrait,
@@ -31,12 +34,6 @@ self.addEventListener('install', function (event) {
 });
 
 async function cacheImages(cache) {
-    try {
-        await cache.add(requestQuote);
-    } catch (e) {
-        await cache.put(requestQuote, new Response(null));
-    }
-
     await cache.addAll(toCache);
 
     const portraitImage = await (await cache.match(requestPortrait)).json();

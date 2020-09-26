@@ -4,16 +4,27 @@
   "description": "Generates deep images with quotes and stuff",
   "icons": [
     {
-      "src": "/../images/splash-screen.png",
+    "src": "/../images/apple-touch.png",
+    "sizes": "192x192",
+     "type": "image/png",
+    "purpose": "maskable"
+     },
+    {
+    "src": "/images/android-chrome-192x192.png",
+    "sizes": "192x192",
+     "type": "image/png"
+     },
+     {
+     "src": "/images/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
-    },
-    {
-          "src": "/../images/apple-touch.png",
-          "sizes": "192x192",
-          "type": "image/png",
-          "purpose": "maskable"
-        }
+      },
+      {
+      "src": "/images/maskable_icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+       "purpose": "any maskable"
+       }
   ],
   "start_url": "/",
   "display": "fullscreen",
