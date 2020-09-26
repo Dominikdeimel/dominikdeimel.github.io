@@ -1,6 +1,11 @@
 const CACHE_NAME = 'DQIG_CACHE';
 const headers = new Headers();
-headers.set('Cache-Control','max-age=86400');
+headers.set('Cache-Control', 'max-age=86400');
+
+const requestPortrait = new Request('https://beibootapi.herokuapp.com/random?mode=portrait', {headers: headers});
+const requestLandscape = new Request('https://beibootapi.herokuapp.com/random?mode=landscape', {headers: headers});
+const requestQuote = new Request('https://quotes.rest/qod');
+
 const toCache = [
     '/',
     '/js/main.min.js',
@@ -10,20 +15,38 @@ const toCache = [
     '/images/splash-screen.png',
     '/font/Barlow-Light.ttf',
     '/font/Barlow-Regular.ttf',
-    new Request('https://beibootapi.herokuapp.com/random?mode=portrait', {headers: headers}),
-    new Request('https://beibootapi.herokuapp.com/random?mode=landscape', {headers: headers})
+    requestPortrait,
+    requestLandscape
 ];
 
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(function(cache) {
-                return cache.addAll(toCache);
-            })
-    );
+self.addEventListener('install', function (event) {
+    if (navigator.onLine) {
+        event.waitUntil(
+            caches.delete(CACHE_NAME)
+                .then(() => caches.open(CACHE_NAME))
+                .then((cache) => cacheImages(cache))
+                .then(self.skipWaiting())
+        );
+    }
 });
 
-self.addEventListener('fetch', function(event) {
+async function cacheImages(cache) {
+    try {
+        await cache.add(requestQuote);
+    } catch (e) {
+        await cache.put(requestQuote, new Response(null));
+    }
+
+    await cache.addAll(toCache);
+
+    const portraitImage = await (await cache.match(requestPortrait)).json();
+    const landscapeImage = await (await cache.match(requestLandscape)).json();
+
+    await cache.add(new Request(`https://beibootapi.herokuapp.com/image/${portraitImage.image}`));
+    await cache.add(new Request(`https://beibootapi.herokuapp.com/image/${landscapeImage.image}`));
+}
+
+self.addEventListener('fetch', function (event) {
     event.respondWith(
         caches.match(event.request)
             .then(cachedResponse => {
@@ -35,7 +58,7 @@ self.addEventListener('fetch', function(event) {
     );
 });
 
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', function (event) {
     event.waitUntil(
         caches.keys()
             .then((keyList) => {
@@ -50,15 +73,9 @@ self.addEventListener('activate', function(event) {
     );
 });
 
-fetch('https://beibootapi.herokuapp.com/random?mode=portrait').then(response => response.json()).then(data => {
-    caches.open(CACHE_NAME)
-        .then(function(cache) {
-            return cache.add(`https://beibootapi.herokuapp.com/image/${data.image}`);
-        });
-});
-fetch('https://beibootapi.herokuapp.com/random?mode=landscape').then(response => response.json()).then(data => {
-    caches.open(CACHE_NAME)
-        .then(function(cache) {
-            return cache.add(`https://beibootapi.herokuapp.com/image/${data.image}`);
-        });
-});
+setInterval(async () => {
+    await caches.delete(CACHE_NAME);
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(toCache);
+    await cacheImages(cache);
+}, 1000 * 60 * 60 * 24);
