@@ -4,6 +4,8 @@ headers.set('Cache-Control', 'max-age=86400');
 
 const requestPortrait = new Request('https://beibootapi.herokuapp.com/random?mode=portrait', {headers: headers});
 const requestLandscape = new Request('https://beibootapi.herokuapp.com/random?mode=landscape', {headers: headers});
+const quoteReq = new Request('https://quotes.rest/qod');
+
 
 const toCache = [
     '/',
@@ -34,6 +36,11 @@ self.addEventListener('install', function (event) {
 });
 
 async function cacheImages(cache) {
+    try {
+        await cache.add(quoteReq);
+    } catch (e) {
+        await cache.put(quoteReq, new Response(null));
+    }
     await cache.addAll(toCache);
 
     const portraitImage = await (await cache.match(requestPortrait)).json();
